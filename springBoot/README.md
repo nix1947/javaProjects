@@ -15,7 +15,7 @@
 - [Many to Many](#many-to-many)
 
 
-## Spring-data-jpa
+# Spring tutorials
 
 ## User Model
 Here table name is given to `tbluser` so as not to conflict with the database global naming. 
