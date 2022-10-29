@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.datatools.sqltools.routineeditor.launching.launchConfigurationType">
+    <stringAttribute key="org.eclipse.datatools.sqltools.debug.launching.databasename" value=""/>
+    <intAttribute key="org.eclipse.datatools.sqltools.debug.launching.optiontype" value="1"/>
+    <stringAttribute key="org.eclipse.datatools.sqltools.debug.launching.procid" value=""/>
+    <stringAttribute key="org.eclipse.datatools.sqltools.debug.launching.profileName" value=""/>
+    <stringAttribute key="org.eclipse.datatools.sqltools.debug.launching.triggersql" value=""/>
+    <intAttribute key="org.eclipse.datatools.sqltools.debug.launching.type" value="0"/>
+</launchConfiguration>
