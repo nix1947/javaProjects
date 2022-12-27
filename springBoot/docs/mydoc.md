@@ -1235,3 +1235,595 @@ It is not recommended to override a version of jars, rather upgrade spring
         <hibernate-validator.version>5.2.3.Final</hibernate-validator.version>
 </properties>
 ```
+
+
+## Password Encoder.
+- Create a `PasswordConfig` class inside security package and return the `PasswordEncoder` instance form this class `PasswordEncoder` is an interface
+- `PasswordEncoder` has three methods `encode, upgradeEncoding, matches`
+
+```java
+// PasswordConfig.java
+package com.pearlinfotech.com.idas.modules.account.security;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+public class PasswordConfig {
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(10);
+
+  }
+}
+
+```
+
+- Use the `PasswordEncoder` bean in `SecuityConfig` as shown below. 
+```java
+// SecurityConfig.java
+public class SecurityConfig {
+
+  @Autowired
+  private final PasswordEncoder passwordEncoder;
+
+  public SecurityConfig(PasswordEncoder passwordEncoder) {
+    this.passwordEncoder = passwordEncoder;
+  }
+}
+```
+- Here passwordEncoder is declared as final so, it needs to be initialize inside constructor, even though it is `@Autowired`
+
+## User detail
+- username unique, password(encoded), roles and authorities
+
+## Intellij shortcuts
+```java
+ctrl + o -> to see the list of suggested 
+ctrl +p -> to see the list of parameters.
+ctrl + alt + v -> extract to variable
+```
+
+## Role and authorities(Permissions)
+
+
+## Adding jwt authentication 
+
+
+### Create certs directory in resource folder.
+```aidl
+resource
+    certs
+    static
+    templates
+    application.properties
+```
+
+- Generate `public key` and `private key` for cets.
+```bash
+  # generate  key pair
+  openssl genrsa -out keypair.pem 2048
+  # generate public key from key pair
+  openssl rsa -in keypair.pem -pubout -out public.pem
+  #Generate private key
+  openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in keypair.pem -out private.pem
+```
+
+- Create configuration to use these public and private key.
+
+### Create configuration class to  Rsa public and private key under security folder  
+
+```java RsaConfiguration.java 
+
+@ConfigurationProperties(prefix = "rsa")
+public record RsaConfiguration(RSAPublicKey rsaPublicKey, RSAPrivateKey rsaPrivateKey) {
+}
+
+```
+
+- Register this configuration inApplication
+```java 
+@SpringBootApplication
+@EnableConfigurationProperties(RsaConfiguration.class) // Registration done here.
+public class IdasApplication {
+
+
+    public static void main(String[] args) {
+
+        SpringApplication.run(IdasApplication.class, args);
+
+    }
+
+}
+ 
+
+```
+
+- **Set the private and public key in application.properties file**
+```aidl
+
+# Rsa key properties.
+rsa.private-key=classpath:certs/private.pem 
+rsa.public-key=classpath:certs/public.pem
+
+```
+
+- **Configure the JWT decoder Bean in `SecurityConfig.java`** class 
+
+```java
+
+@Bean
+public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withPublicKey(rsaConfiguration.rsaPublicKey()).build();
+        }
+
+```
+
+**Using cliRestClient**
+
+```bash
+# Using basic Auth
+htpp :8080 --auth admin:12345 -v
+
+
+#Using Authorization header 
+
+http :8080/api/documents 'Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiYWRtaW4iLCJleHAiOjE2NzE2MzI0MjIsImlhdCI6MTY3MTYyODgyMiwic2NvcGUiOiJST0xFX0FETUlOIFJPTEVfQUtQTCJ9.LFeAmn9dkFFo7iH1dzVr0t-5uEfADGhgx0LvNIvHccE6-m05QtFlA32fdm1kyBXCkaTOhX4fdqEO3Dtg_SeRrzPWLvPB9JaAj-pIovezn2a3J55rlrWVKYJ-PuMQebzp0Q675M7_vz4OPvj4AFzimus9v5Ch1Apu56Idsgpfw9jndfjB9aTKRpYeeG2fBzkcmBokCXjCvq-TNHoVlpU9MtNhst6mgiquue3fpz5aDNuDSw8TUJrGBifMfubRrgo4ZyytZRTqNZJMqDIHuCADF4ImRP0hUmuzqeQ7NBdkOzN1zNefBFLJo0mCu6j8hPq1udynn0E4id6BdQiPDl1k0A'
+```
+
+
+**Enable method level security**
+- Add `@EnableMethodSecurity(prePostEnabled=true`) in `SecurityConfig` for method level authorization
+```java
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping
+    public Role createRole(@RequestBody Role role) {
+        return roleService.createRole(role);
+    }
+
+    
+```
+
+**use @JsonIgnore** annotation to cover the `stackoverflow error` in one to many or many to many fields
+
+**`@Temporal(TemporalType.TIMESTAMP)` is used to define TIMESTAMP database type in spring boot.
+
+### CreatedDate, updatedDate and modifiedBy and createdBy defination. 
+- Create `config` package and add `JpaConfig.java`
+- implement `AuditorAware` interface and override a `getCurrentAuditor()` method to get the userName detials
+- Create `AuditorAware` bean with `EnableJpaAuditing` annotation in `JpaConfig.java` file.
+- 
+**JpaConfig.java** 
+```java
+@Configuration
+@EnableJpaAuditing(auditorAwareRef = "auditorAware")
+public class JpaConfig {
+    public class AuditorAwareImpl implements AuditorAware<String> {
+        @Override
+        public Optional<String> getCurrentAuditor() {
+            Principal principal =  SecurityContextHolder.getContext().getAuthentication();
+            return  Optional.of(principal.getName());
+        }
+    }
+
+    @Bean
+    public AuditorAware<String> auditorAware() {
+        return new AuditorAwareImpl();
+    }
+}
+
+```
+
+**Use `@CreatedAt`, `@LastModifed` annotation in `Entity`
+- `@EntityListeners(AuditingEntityListener.class)` in the `Entity` class
+```java
+import javax.persistence.Entity;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+public class Role {
+  @LastModifiedBy
+  @Column(name="lastModifiedBy")
+  private String lastModifiedBy;
+
+  @CreatedBy
+  @Column(name="createdBy", updatable = false)
+  private String createdBy;
+
+  @CreatedDate
+  @Column(name="createdAt", updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date createdAt;
+
+  @LastModifiedDate
+  @Column(name="lastModifiedAt")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModifiedAt;
+
+}
+```
+
+## Unique on multiple column
+```java
+- In a Spring application, you can create a unique constraint on multiple columns by using the @UniqueConstraint annotation on the @Table annotation.
+@Entity
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"email", "username"})
+})
+public class User {
+    // ...
+}
+```
+
+## Using `@RequestParam` in controller. 
+- To use `@RequestParam` you need to use spring validator
+- Simply put, we can use `@RequestParam` to extract query parameters, form parameters, and even files from the request
+- Method parameters annotated with @RequestParam are required by default.
+- We can configure our @RequestParam to be optional, though, with the required attribute: `@RequestParam(required = false) String id`
+
+```java
+
+@RestController
+public class MyController {
+
+    @PostMapping("/users")
+    public void createUser(@RequestParam("name") String name,
+                           @RequestParam("age") int age,
+                           @RequestParam("avatar") MultipartFile avatar) {
+        // Do something with the name, age, and avatar variables
+    }
+}
+```
+## Pagination 
+
+## Register and Login 
+
+## Document Saving 
+
+## Document scanning 
+
+## AuditHistory and envers
+
+## DTO and Validation 
+- Add spring validator 
+- Create an exception handling class to process errors
+- Create DTO class to match the user request 
+- Add @Valid DTOClass class in Spring controller. 
+
+
+**Adding spring validator**
+```java
+
+<dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+
+```
+
+**Create Exception Handling class** in `exception` package
+- All the exceptions are handled using this class
+```java 
+package com.pearlinfotech.com.idas.modules.account.exceptions;
+
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+public class ValidationExceptionHandler {
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleInvalidDtoArgument(MethodArgumentNotValidException ex) {
+
+        Map<String, String> errors = new HashMap<>();
+        // grab key and values
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            errors.put(error.getField(), error.getDefaultMessage());
+        });
+
+        return errors;
+
+
+    }
+    
+    // Handle RoleNotFound
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(RoleNotFoundException.class)
+    public Map<String, String> handleRoleNotFoundException(RoleNotFoundException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+
+
+
+}
+
+```
+
+**Create DTO class inside DTO package**
+
+```java
+package com.pearlinfotech.com.idas.modules.account.dto;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Role {
+
+    private String roleName;
+}
+
+```
+
+**Use DTO in controller**
+```java
+    // Create a new role
+    @PostMapping
+    public ResponseEntity<Object> createRole(@RequestBody @Valid RoleRequest roleRequest) {
+
+        try {
+            var newRole = roleService.createRole(roleRequest);
+            return new ResponseEntity<>(newRole, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Role" + roleRequest.getRoleName()+  "already exist");
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+
+```
+
+
+
+## Composite Key  defining 
+- First create an Embeeded class
+
+```java
+import lombok.*;
+
+import javax.persistence.Embeddable;
+import java.io.Serializable;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Embeddable // this is the key 
+class CompositeKey implements Serializable {
+  private String email;
+  private String phone;
+
+}
+```
+
+- Use the above Composite key in entity class
+
+```java
+
+
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
+
+public class Employee {
+  @EmbeddedId
+  private CompositeKey pk;
+  private String employeeCode;
+}
+```
+
+## Spring Boot with Swagger
+
+
+## Entity Rest code generator tool
+- Use `Entity Spring Rest CODE generator` with jetBran plugins
+
+## Miscellaneous
+
+**Component Scan**
+```java
+import org.springframework.context.annotation.ComponentScan;
+
+@ComponentScan({'com.example.controller.*', 'com.example.service.*'})
+public class IdasApplication {
+}
+```
+
+**Extracting value from application.properties**
+
+```java
+import org.springframework.beans.factory.annotation.Value;
+
+public class MyEntity {
+  @Value("${app.name}}")
+  private String name;
+
+  @Value("${app.lastName:IAMDEFAULTVALUE}}")
+  private String lastName;
+}
+```
+- JackSon library will convert java objects in json.
+
+**Build application**
+- Use `maven` spring boot build plugin to build to jar.
+- Builded jar file is dispatched to `target` folder
+- to run jar file use command `java -jar myapp.jar`
+
+**`@JsonResponse` annotation to ignore fields. 
+- Use this annotation to not to populate the fields in JsonResponse, this useful to stop `recursive` serialization.
+
+**`@JsonProperty` is used to rename the field while rendering the data.
+
+```java
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Student {
+  private int id;
+
+  // in response it is rendered as `first_name` as a key rather than firstName
+  @JsonProperty("first_name")
+  private String firstName
+}
+```
+
+**Use `Builder.Default` to set the default value in entity from `Lombok`
+```java
+public class Role {
+  @Column(name = "uuid", unique = true)
+  @Builder.Default
+  private String uuid = UUID.randomUUID().toString();
+  
+  
+  @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
+  @JsonIgnore
+  @Builder.Default
+  private Set<RoleAuthority> authorities = new HashSet<>();
+
+}
+```
+- In `lombok` `@Data` is equivalent to `@Getter, @Setter, @ToString, @EqualAndHashCode`
+
+**Use `@EntityScan` in `Application.java` to scan all the entity if you want explictly.
+
+- Some repository exists are `JpaRepository, PagingAndSortingRepository, CrudRepository`
+- use `@EnableJpaRepositores` in application to enable jparepository.
+- Use `@Valid` annotation using spring validation
+- Use `@PathVariable` annotation
+- `@RequestParam` are called queryParameters in url `?name=20` 
+
+## Pagination 
+- Use `Pageable` interface
+
+**Paging**
+```java
+public List<User> getAllUserwithPageable(int pageNo, int pageSize) {
+        // Zero index based paging.
+        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+        return userRepository.findAll(pageable).getContent();
+}
+
+```
+
+**Sorting**
+```java
+public List<User> sortingUser()  {
+    Sort sort = Sort.by(Sort.Direction.ASC, "firstName");
+    return userRepository.findAll(sort);
+    
+}
+```
+
+
+## Jpql 
+- Use `@Query` annotation  in repository interface
+- Use `@Modifying` and `@Transactional` annotation for update query while using `jpql`
+
+```java
+import com.pearlinfotech.com.idas.modules.account.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface StudentRepository extends JpaRepository<T, User> {
+    @Query("From student where firstName=:firstname and lastName=: last_name")
+    User getByLastNameAndFirstName(String lastName, @Param("last_name") String firstName);
+}
+```
+
+
+## Spring boot file upload and download
+**Store file in file system** 
+
+***Entity***
+
+```java
+public class FileData {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String name;
+  private String type;
+  private String filePath;
+}
+```
+
+***FileDataRepository.java***
+```java
+public interface FileDataRepository extends JpaRepository<FileData,Integer> {
+    Optional<FileData> findByName(String fileName);
+}
+```
+
+***StorageService.java***
+```java
+@Service
+public class StorageService {
+
+  @Autowired
+  private FileDataRepository fileDataRepository;
+
+  private final String FOLDER_PATH="/Users/javatechie/Desktop/MyFIles/";
+
+  
+  public String uploadImageToFileSystem(MultipartFile file) throws IOException {
+    String filePath=FOLDER_PATH+file.getOriginalFilename();
+
+    FileData fileData=fileDataRepository.save(FileData.builder()
+            .name(file.getOriginalFilename())
+            .type(file.getContentType())
+            .filePath(filePath).build());
+
+    file.transferTo(new File(filePath));
+
+    if (fileData != null) {
+      return "file uploaded successfully : " + filePath;
+    }
+    return null;
+  }
+
+  public byte[] downloadImageFromFileSystem(String fileName) throws IOException {
+    Optional<FileData> fileData = fileDataRepository.findByName(fileName);
+    String filePath=fileData.get().getFilePath();
+    byte[] images = Files.readAllBytes(new File(filePath).toPath());
+    return images;
+  }
+}
+```
+
+***Controller.java***
+```java
+@PostMapping("/fileSystem")
+	public ResponseEntity<?> uploadImageToFIleSystem(@RequestParam("image")MultipartFile file) throws IOException {
+		String uploadImage = service.uploadImageToFileSystem(file);
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(uploadImage);
+	}
+
+	@GetMapping("/fileSystem/{fileName}")
+	public ResponseEntity<?> downloadImageFromFileSystem(@PathVariable String fileName) throws IOException {
+		byte[] imageData=service.downloadImageFromFileSystem(fileName);
+		return ResponseEntity.status(HttpStatus.OK)
+				.contentType(MediaType.valueOf("image/png"))
+				.body(imageData);
+
+	}
+```
