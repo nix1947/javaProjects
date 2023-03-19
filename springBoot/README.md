@@ -25,7 +25,7 @@
 - [Set the default date in column hibernate.](#set-the-default-date-in-column-hibernate)
 
 
-## Spring-data-jpa
+# Spring tutorials
 
 ## User Model
 Here table name is given to `tbluser` so as not to conflict with the database global naming. 
@@ -618,6 +618,7 @@ class Course {
 
 
 ```
+<<<<<<< HEAD
 
 ## Creating Services 
 **Create UserService interface and its implementation**
@@ -1012,3 +1013,5 @@ public class WebSecurityConfig {
 ```sql
 ALTER TABLE users MODIFY created_date DATE NOT NULL DEFAULT (CURRENT_DATE)
 ```
+=======
+>>>>>>> 3fc05b546b809651454911ba7c9f72ecfc3336e9

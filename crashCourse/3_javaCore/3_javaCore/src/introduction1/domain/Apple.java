@@ -1,12 +1,12 @@
-package introduction1;
+package introduction1.domain;
 import java.util.Objects;
 
 public class Apple {
 
     private int weight = 0;
-    private String color = "";
+    private Color color;
 
-    public Apple(int weight, String color) {
+    public Apple(int weight, Color color) {
         this.weight = weight;
         this.color = color;
     }
@@ -19,11 +19,11 @@ public class Apple {
         this.weight = weight;
     }
 
-    public String getColor() {
-        return color;
+    public Color getColor() {
+        return this.color;
     }
 
-    public void setColor(String color) {
+    public void setColor(Color color) {
         this.color = color;
     }
 

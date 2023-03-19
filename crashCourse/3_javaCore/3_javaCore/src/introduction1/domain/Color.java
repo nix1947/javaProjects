@@ -1,2 +1,7 @@
-package introduction1.domain;public class Color {
+package introduction1.domain;
+
+
+public enum Color {
+    RED,
+    GREEN
 }

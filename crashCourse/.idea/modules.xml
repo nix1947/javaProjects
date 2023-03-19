@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/1_java_rmi/1_java_rmi.iml" filepath="$PROJECT_DIR$/1_java_rmi/1_java_rmi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/2_javaThread/2_javaThread.iml" filepath="$PROJECT_DIR$/2_javaThread/2_javaThread.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/crashCourse.iml" filepath="$PROJECT_DIR$/.idea/crashCourse.iml" />
+    </modules>
+  </component>
+</project>

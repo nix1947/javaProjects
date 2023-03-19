@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="0a5f9908-0cd4-4ba2-851b-21e3850a433f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../../.idea/crashCourse.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../1_java_rmi/1_java_rmi.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../2_javaThread/2_javaThread.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/3_javaCore.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/FunctionExample.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/InputOutput.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/JShellExample.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/LambdaMain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/PredicateExample.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/StreamExample.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/StringExample.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/domain/Apple.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/domain/Color.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/domain/OptionalTutorial.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/introduction1/index.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../bak/corejava/v1ch02/Welcome/Welcome.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../bak/corejava/v2ch02/v2ch02.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../javacore/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../javacore/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../javacore/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../javacore/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../javacore/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../javacore/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../javacore/javacore.iml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectId" id="2GsTEogj5xCluEMZBnG4LdpI6rO" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "settings.editor.selected.configurable": "com.maddyhome.idea.vim.ui.VimEmulationConfigurable"
+  }
+}]]></component>
+  <component name="RunManager" selected="Application.StreamExample">
+    <configuration name="FunctionExample" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="introduction1.FunctionExample" />
+      <module name="3_javaCore" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="introduction1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="JShellExample" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="introduction1.JShellExample" />
+      <module name="3_javaCore" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="introduction1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StreamExample" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="introduction1.StreamExample" />
+      <module name="3_javaCore" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="introduction1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StringExample" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="introduction1.StringExample" />
+      <module name="3_javaCore" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="introduction1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="introduction1.InputOutput" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="introduction1.InputOutput" />
+      <module name="3_javaCore" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="introduction1.domain.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.StreamExample" />
+        <item itemvalue="Application.StringExample" />
+        <item itemvalue="Application.JShellExample" />
+        <item itemvalue="Application.FunctionExample" />
+        <item itemvalue="Application.introduction1.InputOutput" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0a5f9908-0cd4-4ba2-851b-21e3850a433f" name="Changes" comment="" />
+      <created>1667176186363</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1667176186363</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

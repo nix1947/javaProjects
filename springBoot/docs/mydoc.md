@@ -1049,7 +1049,7 @@ public interface  Filter {
 
 **Minimum implementation of userDetails***
 ```java AppUser.java
-public class AppUser implements UserDetails {
+public class SpringUserDetails implements UserDetails {
  @Override
  public String getUsername() {
  return "bill";
@@ -1103,6 +1103,96 @@ UserDetails u = User.withUsername("bill")
 
 ```
 
+**Implement `UserDetailsService` as `SpringUserDetailsService`**
+```java
+@Service
+public class SpringUserDetailsService implements UserDetailsService {
+
+    @Autowired
+    private UserRepository repository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = repository.findByUserName(username);
+        return user.map(GroupUserDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException(username + " Not Found"));
+    }
+}
+```
+**Implement `UserDetails` as `SpringUserDetails`**
+```java
+
+public class SpringUserDetails implements UserDetails {
+
+    private String userName;
+    private String password;
+    private boolean isActive;
+    private List<GrantedAuthority> authorities;
+
+    public GroupUserDetails(User user) {
+        this.userName = user.getUserName();
+        this.password = user.getPassword();
+        this.isActive = user.isActive();
+        this.authorities = Arrays.stream(user.getRoles().split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return userName;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+}
+```
+
+**Protect controller**
+```java
+@GetMapping("/access/{userId}/{userRole}")
+    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MODERATOR')")
+    public String giveAccessToUser(@PathVariable int userId, @PathVariable String userRole, Principal principal) {
+        User user = repository.findById(userId).get();
+        List<String> activeRoles = getRolesByLoggedInUser(principal);
+        String newRole = "";
+        if (activeRoles.contains(userRole)) {
+            newRole = user.getRoles() + "," + userRole;
+            user.setRoles(newRole);
+        }
+        repository.save(user);
+        return "Hi " + user.getUserName() + " New Role assign to you by " + principal.getName();
+    }
+```
+
 *****PasswordEncoder*****: 
   - It encodes password and verifies if the password matches an existing encoding.
   - the PasswordEncoder is mandatory for the Basic authentication flow.
@@ -1127,10 +1217,78 @@ UserDetails u = User.withUsername("bill")
 **Spring security autoconfiguration**
 - The SecurityAutoConfiguration is at the heart of Spring Security autoconfiguration. It leverages three other classes, SpringBootWebSecurityConfiguration, WebSecurityEnablerConfiguration, and SecurityDataConfiguration, to perform the  autoconfiguration
 
+**JWT implementation**
+
+
+**Post Construct**
+- Use `@PostConstruct` annotation to initilize the database with value. 
+```java
+
+```
+
 ### portable service abstraction  
 
 ### AOP: Aspect oriented programming
-- AspectJ
+- Create a `AspConfig` configuration file and log all the execution using `AOP`
+```java
+
+package com.example.aop;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@Aspect
+public class AspectConfig {
+    // Define a logger
+	Logger logger = LoggerFactory.getLogger(getClass());
+
+	/*@Before(value = "execution(* com.pearlinfotech.com.idas.modules.account.controller.*.*(..))")
+	public void beforeAdvice (JoinPoint joinPoint) {
+		logger.info("Inside Before Advice");
+	}*/
+	
+	/*@Before(value = "execution(* com.example.controller.*.*(..)) and args(object)")
+	public void beforeAdvice (JoinPoint joinPoint, Object object) {
+		logger.info("Request = " + object);
+	}*/
+	
+	/*@After(value = "execution(* com.example.controller.*.*(..)) and args(object)")
+	public void beforeAdvice (JoinPoint joinPoint, Object object) {
+		logger.info("Request = " + object);
+	}*/
+	
+	/*@AfterReturning(value = "execution(* com.example.controller.*.*(..)) and args(object)",
+			returning = "returningObject")
+	public void beforeAdvice (JoinPoint joinPoint, Object object, Object returningObject) {
+		logger.info("Response = " + returningObject);
+	}*/
+	
+	@Around(value = "execution(* com.example.controller.*.*(..)) and args(object)")
+	public void aroundAdvice (ProceedingJoinPoint proceedingJoinPoint, Object object) {
+		logger.info("Request = " + object);
+		
+		Object returningObject = null;
+		try {
+			returningObject = proceedingJoinPoint.proceed();
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		logger.info("Response = " + returningObject);
+	}
+}
+
+
+
+```
 
 
 ### Unit testing
@@ -1205,7 +1363,6 @@ class MathTest {
   }
 
   
-
  
   @Test
   public void simpleTest() {
@@ -1478,7 +1635,6 @@ public class MyController {
     }
 }
 ```
-## Pagination 
 
 ## Register and Login 
 
@@ -1631,8 +1787,128 @@ public class Employee {
 }
 ```
 
-## Spring Boot with Swagger
+## Api documentation
+- see this <a href="https://springdoc.org/#Introduction">Link</a> for configuration, swagger is more buggy and only support old version of spring boot, spring-doc support more webflux and other.
+- Use this `spring-doc` with swagger-ui
 
+**Add dependency**
+```xml
+   <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-ui</artifactId>
+      <version>1.6.14</version>
+   </dependency>
+
+```
+
+**Add `@OpenAPIDefination` annotation in application**
+```java
+@OpenAPIDefinition
+public class IdasApplication {
+}
+
+```
+
+**Document your endpoint**
+```java
+    // Create a new role
+@PostMapping
+@Operation(summary = "Api to create new role")
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200",
+                description = "Role created",
+                content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RoleRequest.class))
+                })})
+public ResponseEntity<Object> createRole(@RequestBody @Valid RoleRequest roleRequest) {
+        try {
+        var newRole = roleService.createRole(roleRequest);
+        return new ResponseEntity<>(newRole, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException e) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Role" + roleRequest.getRoleName() + "already exist");
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+
+        }
+```
+
+**Browse the api documentation**
+- This is only json Response
+```bash
+http://localhost:8000/v3/api-docs
+```
+
+UI: browse 
+```bash
+http://localhost:8000/swagger-ui.html
+```
+
+**Disable spring doc swagger ui in production**
+- add this `application.properties`
+```text
+springdoc.swagger-ui.enabled=false
+```
+**But enable in management port**
+```yaml
+springdoc:
+  use-management-port: true 
+
+server:
+  port: 8080 
+    
+management:
+  server:
+    port:9090
+  endpoints:
+    web:
+      exposure:
+        include: openapi, swaggerui
+    
+```
+
+- Browse in managementpoint by `http://localhost:9090/actuator/swagger-ui`
+- `actuator` is not available in 8080
+
+
+## Logging in spring boot
+- Different level of logging `Error<Warn<Info<Debug<Trace`
+- By default `Info` is the default logging, with this below info are enabled
+
+```java
+  Logger logger = LoggerFactory.getLogger(RoleController.class);
+// Or 
+Logger logger = LoggerFactory.getLogger(getClass());
+// getClass is equivalenet to RoleController.class
+logger.error("Error occoured");
+logger.warn()
+logger.info()
+logger.debug()
+logger.trace()
+```
+
+**setting the log file**
+```yaml
+logging.file.name=app.log
+```
+
+**Set logging level in application.properties file**
+```yaml
+logging.level.root=debug
+```
+
+## Spring AOP (Aspect oriented programming)
+- **Point cut**: Which method to intercept
+- **Advice**: When to intercept the method `Before, After, AfterReturning, Around
+  - `Before`: Run the method before start of execution the method
+  - `After`: Run intercept `After` it returns some value
+- **Aspect**: Combination of `PointCut` + `Advice`
+- **Join point**: Execution `instance` of an `Advice`
+
+
+**Before Advice** 
+
+
+## Spring Boot Admin
 
 ## Entity Rest code generator tool
 - Use `Entity Spring Rest CODE generator` with jetBran plugins
@@ -1709,6 +1985,9 @@ public class Role {
 - Use `@Valid` annotation using spring validation
 - Use `@PathVariable` annotation
 - `@RequestParam` are called queryParameters in url `?name=20` 
+
+**Maven central**
+`https://search.maven.org/classic/#search%7Cga%7C1%7C%22Springfox%20Swagger2%22`
 
 ## Pagination 
 - Use `Pageable` interface
@@ -1826,4 +2105,170 @@ public class StorageService {
 				.body(imageData);
 
 	}
+```
+
+## Spring ROO 
+
+
+## Spring data elastic search
+
+
+## Spring boot docker.  
+
+## Spring boot websockets
+
+## Entity
+- Using enum as attributed in entity 
+```java
+public Enum PostStatus {
+	PUBLISHED, DRAFTED, PENDING;
+
+}
+
+@Entity
+class Post {
+@Enumerated(EnumType.STRING)
+private PostStatus status; 
+
+}
+
+```
+
+## spring boot database migration flyway
+Flyway is a tool to track the database changes 
+
+
+## Spring profile
+- use `@Profile` annotation in your `repository` 
+- Use `spring.profile.active=dev` flag to set the environment
+- create `application-dev.properties, application-prod.properties` file accordingly with db settings.
+**UserRepository.java**
+```java
+@Service
+@Profile(value={"local", "dev", "prod"})
+class UserRepository {
+    
+}
+```
+## Stored procedure in spring boot
+- First create a procedure in your database.
+```sql
+create procedure `getTickets` () 
+begin
+    select * from tickets
+end
+
+-- Another 
+create procedure `getTicketByCategoryProcdure` (in tcategory varchar(20))
+begin
+select * from tickets where category=tcategory;
+end
+
+    
+```
+- Mention this `procedure` in `entity` level in your application.
+
+```java
+
+import javax.persistence.NamedStoredProcedureQueries;
+import javax.persistence.NamedStoredProcedureQuery;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureParameter;
+
+@Entity
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(name = "getTicketProcedure", procedureName = "getTickets"),
+        @NamedStoredProcedureQuery(
+                name = "getTicketByCategory",
+                procedureName = "getTicketByCategoryProcdure",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN, name = "tCategory", type = String.class)
+                }
+        )
+})
+public class Tickets {
+
+}
+```
+
+- call the above service in service layer.
+- Use `EntityManager` to call the storedProcedure.
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class TicketService {
+  @Autowired
+  private EntityManager em; 
+  
+  @SuppressWarnings("unchecked")
+  public List<Ticket> getTicketInfo() {
+      em.createNamedStoredProcedureQuery("getTicketProcedure").getResultList();
+  }
+  
+  public List<Ticket> getTicketByCategory(String categoryType) {
+      return em.createNamedStoredProcedureQuery("getTicketByCategory").setParameter("tcategory", categoryType)getResultList();
+  }
+}
+```
+
+
+## Spring boot scheduler
+- To set a scheduler use `@Scheduled` annotation in spring boot in `Servic` layer.
+- Use `@EnabledScheduling` in spring application
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Component
+public class UserScheduler {
+
+  private static final Logger logger = LoggerFactory.getLogger(UserScheduler.class);
+
+  @Autowired
+  private UserService userService;
+
+  @Scheduled(cron = "0 */5 * * * *")
+  public void fetchUsers() {
+    List<User> users = userService.getUsers();
+    for (User user : users) {
+      logger.info(user.toString());
+    }
+  }
+}
+
+```
+
+
+
+
+```java
+import com.pearlinfotech.com.idas.modules.account.repository.UserRepository;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+
+class UserService {
+  @Autowired
+  private UserRepository userRepository;
+
+  @Scheduled(fixedRate = 5000) // 5000 ms
+  public addRandomUserEveryFiveSec() {
+    User user = new User();
+    user.setName("RandomUser" + new Random().nextInt());
+    userRepository.save(user);
+    System.out.println("User added " + new Date().toString());
+  }
+
+  
+  // fetch every five  minutes.
+  @Scheduled(cron = "0/5 * * * * ")
+  public void fetchDb() {
+    Logger logger = LoggerFactory(getClass());
+    List<User> users = userRepository.findAll();
+    logger.info("users: ", users);
+  }
+}
+
 ```
