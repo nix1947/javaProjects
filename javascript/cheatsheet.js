@@ -9,8 +9,8 @@ function spreadOperatorTutorial {
  * Immediately invoked function expression
  * 
  * @Example 
- * (function helloWorld() {
- * 
- *  console.log("hello world");
- * })();
+ * (function (arg1, arg2) {
+  // code here
+})(value1, value2);
+
  */
