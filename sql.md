@@ -24,6 +24,12 @@ date,
 text
 ```
 
+## Importing database
+```
+$ createdb mydb
+$ psql parch < parch_and_posey.sql
+```
+
 
 ## Create query from sql
 `Reference: https://stackoverflow.com/questions/16818796/generate-sql-insert-script-from-excel-worksheet/16819629`
