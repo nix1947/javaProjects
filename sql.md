@@ -11,9 +11,11 @@
 -- Trigger
 -- database function
 -- view
--- aggregration (min, max, count)
-
+-- aggregration (min, max, count, sum,)
 ```
+
+## Features
+```concurrent access, access management```
 
 ## Data types
 ```
@@ -22,6 +24,48 @@ integer,
 timestamp
 date,
 text
+```
+
+## Constraints in database
+```unique, not null, primary key, foreign key, check```
+```
+-- Create Department table
+CREATE TABLE Department (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(50) NOT NULL
+);
+
+-- Create Employee table with various constraints
+CREATE TABLE Employee (
+    employee_id INT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    department_id INT,
+    salary DECIMAL(10, 2) DEFAULT 0,
+    hire_date DATE,
+    email VARCHAR(100) UNIQUE,
+    
+    -- Check constraints
+    CONSTRAINT chk_salary CHECK (salary >= 0),
+    CONSTRAINT chk_hire_date CHECK (hire_date <= CURRENT_DATE),
+    
+    -- Foreign key constraint
+    CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES Department(department_id),
+    
+    -- Additional check constraints
+    CONSTRAINT emp_name_length CHECK (LENGTH(first_name) + LENGTH(last_name) <= 100),
+    
+    -- Default constraint
+    CONSTRAINT emp_name_default DEFAULT 'John' || ' ' || 'Doe'
+);
+
+-- Insert sample department data
+INSERT INTO Department (department_id, department_name)
+VALUES
+    (1, 'HR'),
+    (2, 'Engineering'),
+    (3, 'Marketing');
+
 ```
 
 ## Importing database
