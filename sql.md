@@ -11,7 +11,7 @@
 -- Trigger
 -- database function
 -- view
--- 
+-- aggregration (min, max, count)
 
 ```
 
