@@ -6,7 +6,22 @@
 -- insert data in table
 -- delete data in table
 -- update data in table
+-- ER diagram
+-- Window function
+-- Trigger
+-- database function
+-- view
+-- 
 
+```
+
+## Data types
+```
+varchar,
+integer,
+timestamp
+date,
+text
 ```
 
 
