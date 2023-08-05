@@ -210,3 +210,4 @@ FROM
 	sales_organization
 CROSS JOIN sales_channel; 
 ```
+
