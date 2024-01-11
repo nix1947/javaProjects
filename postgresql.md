@@ -12,5 +12,10 @@
 CREATE EXTENSION IF NOT EXISTS "pg_enum";
  ```
 
+## Alter column 
+alter table listed_companies add column ipoalloted_date date null
+add column total_listed_share number(11) null
+add column public_holding number(2) null 
+
 
 
